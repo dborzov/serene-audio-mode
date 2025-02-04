@@ -1,4 +1,4 @@
-# serene-audio-mode
+## serene-audio-mode
 
 Tired of dramatic volume swings in modern movies? 
 
@@ -7,7 +7,7 @@ Tired of dramatic volume swings in modern movies?
 You can read more on how exactly it works [here](https://github.com/dborzov/serene-audio-mode).
 
 
-# WIP warning
+## WIP warning
 
 This project is work-in-progress and not especially user-friendly yet. 
 
@@ -27,7 +27,7 @@ This will make it faster and easier to distribute as a standalone binary. And ma
 
 
 
-# Install
+## Install
 
 Use `conda` to install Python 3.9+, `numpy`, `librosa`, `av`. 
 
@@ -54,12 +54,12 @@ python serene.py [audio_input_path] [audio_output_path] [options]
 
 | Short | Long              | Default | Description                                                                                                                               |
 | :---- | :---------------- | :------ | :---------------------------------------------------------------------------------------------------------------------------------------- |
-| `-tt` | `--time_tick`     | `0.01`  | Duration of intervals for RMS loudness evaluation (in seconds).                                                                         |
-| `-tf` | `--time_fade`     | `1.0`   | Duration of intervals of constant volume configuration (in seconds).                                                                    |
-| `-bw` | `--bass_weight`   | `4`     | The relative importance/weight paid to the low-band part vs the high-band part for loudness level detection.                          |
-| `-lc` | `--low_cutoff_freq` | `70.0`  | The sub-bass cut-off frequency for obnoxious noise detection (in Hz).                                                                 |
-| `-mr` | `--mid_range_freq` | `100.0` | Sounds below this frequency are cut out of the audiotrack by default (in Hz).                                                          |
-| `-tv` | `--tap_value`     | `32`    | How steep is the gain function: `tap_value * tanh(levels / tap_value)`. A higher value means steeper volume adjustments. |
+| `-tt` | `time_tick`     | `0.01`  | Duration of intervals for RMS loudness evaluation (in seconds).                                                                         |
+| `-tf` | `time_fade`     | `1.0`   | Duration of intervals of constant volume configuration (in seconds).                                                                    |
+| `-bw` | `bass_weight`   | `4`     | The relative importance/weight paid to the low-band part vs the high-band part for loudness level detection.                          |
+| `-lc` | `low_cutoff_freq` | `70.0`  | The sub-bass cut-off frequency for obnoxious noise detection (in Hz).                                                                 |
+| `-mr` | `mid_range_freq` | `100.0` | Sounds below this frequency are cut out of the audiotrack by default (in Hz).                                                          |
+| `-tv` | `tap_value`     | `32`    | How steep is the gain function: `tap_value * tanh(levels / tap_value)`. A higher value means steeper volume adjustments. |
 
 
 
