@@ -10,6 +10,7 @@ Tired of dramatic volume swings in modern movies?
 
 You can read more on how exactly it works [here](https://github.com/dborzov/serene-audio-mode).
 
+To get a general idea about what the result feels like compare [before](https://www.youtube.com/watch?v=MNZZhTXw72M) and [after](https://youtu.be/-Cy1-18S5A0).
 
 ## WIP warning
 
