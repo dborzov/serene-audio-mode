@@ -2,6 +2,10 @@
 
 Tired of dramatic volume swings in modern movies? 
 
+
+![screenshot](https://www.borzov.ca/img/serene/comic.jpg)
+
+
  `serene-audio-mode` is a tool that lets you rebalance the audiotracks of videos by selectively reducing the volume of loud, bass-heavy, and jarring sounds (explosions, gunfire, and aggressive musical beats), while leaving the rest (things like dialogue) untouched. No more scrambling for the remote when a whisper is followed by an explosion that reverberates down your spine – just consistent, comfortable listening.
 
 You can read more on how exactly it works [here](https://github.com/dborzov/serene-audio-mode).
