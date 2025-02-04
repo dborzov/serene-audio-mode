@@ -27,6 +27,7 @@ BUTTER_ORDER = 5
 FREQ_SUB = 60
 FREQ_BASS = 250
 RMS_THRESHOLD = 0.01
+BASS_WEIGHT = 4
 
 tick_size = int(TIME_TICK*sr)
 ticks_in_fade = int(TIME_FADE / TIME_TICK)
@@ -69,7 +70,7 @@ def calc_tops(rms):
 
 
 rms1 = calc_rms(y_bassed, tick_size)
-rms2 = calc_rms(np.roll(y_bassed, - tick_size// 2), tick_size)
+rms2 = calc_rms(np.roll(2*y, - tick_size// 2), tick_size)
 rms = rms1+rms2
 fade_levels = calc_tops(rms)
 print(f"loudness analysis done")
