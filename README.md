@@ -1,6 +1,6 @@
 ## serene-audio-mode
 
-Tired of dramatic volume swings in modern movies? 
+Tired of dramatic volume swings in modern movies? Wishing you could watch something without disturbing those who are close to you?
 
 
 
