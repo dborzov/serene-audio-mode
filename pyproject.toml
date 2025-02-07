@@ -32,6 +32,7 @@ dependencies = [
     "numpy",
     "ffmpeg-python",
     "soundfile",
+    "av>=14.1.0",
 ]
 
 [project.urls]
@@ -39,7 +40,7 @@ dependencies = [
 "Bug Tracker" = "https://github.com/dborzov/serene-audio-mode/issues"
 
 [project.scripts]
-serene-audio-mode = "serene_audio_mode.cli:main"
+serene-audio-mode = "serene-audio_mode.cli:main"
 serene-audio-mode-dev = "serene_audio_mode.cli_dev:main"
 
 [tool.hatch.build.targets.wheel]
@@ -53,7 +54,4 @@ pythonpath = [
 testpaths = [
     "serene_audio_mode/tests",
 ]
-
-[tool.uv]
-lock = "uv.lock"
 
