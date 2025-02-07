@@ -1,7 +1,7 @@
 import argparse
 import sys
 import traceback
-from serene_audio_mode import formats  # Assuming you have a formats.py
+from serene_audio_mode import formats
 
 
 def inspect_command(args):
@@ -9,11 +9,12 @@ def inspect_command(args):
 
 def load_command(args):
     try:
-        audio_data, sample_rate = formats.load_audio_track_from_container_optimized(args.path)
+        audio_data, sample_rate = formats.load_audio_track_from_container(args.path)
         print(f"Loaded audio track from '{args.path}'.")
         print(f"  Sample Rate: {sample_rate} Hz")
         print(f"  Number of Samples: {len(audio_data)}")
         print(f"  Data Type: {audio_data.dtype}")
+        formats.save_audio_as_mp3(audio_data, sample_rate, "output.mp3")
     except Exception:
         print(f"An error occurred while loading the audio track from '{args.path}':", file=sys.stderr)
         traceback.print_exc()

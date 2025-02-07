@@ -1,5 +1,5 @@
 import argparse
-import serene
+from serene_audio_mode import formats, serene
 import librosa
 import numpy as np
 import humanize
@@ -98,7 +98,7 @@ def main():
     # 7. Save Output
     print("\n[7/7] Saving output...")
     start_time = time.time()
-    serene.save_audio_as_mp3(y_serene2, sr, audio_output_path)
+    formats.save_audio_as_mp3(y_serene2, sr, audio_output_path)
     print(f"  Output saved to {audio_output_path} in {time.time() - start_time:.2f} seconds")
 
     print("\n... complete\n\n")
