@@ -1,3 +1,4 @@
+import numpy as np
 from band_filters import *
 from rms import *
 

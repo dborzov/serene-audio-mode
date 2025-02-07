@@ -19,9 +19,14 @@ To get a general idea about what the result feels like compare [before](https://
 
 ## Install
 
-Use `conda` to install Python 3.9+, `numpy`, `librosa`, `av`. 
+This tool relies on [ffmpeg](https://www.ffmpeg.org/) to read and write to the video files. 
 
-Then clone this repo:
+Install it with pip or download the latest release binary.
+
+
+
+
+:
 
 ```
 git clone https://github.com/dborzov/serene-audio-mode.git
