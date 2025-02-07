@@ -1,24 +1,22 @@
 import argparse
 import sys
+import traceback
 from serene_audio_mode import formats  # Assuming you have a formats.py
 
 
 def inspect_command(args):
-    """Handles the 'inspect' subcommand."""
     formats.inspect_audio_tracks(args.path)
 
 def load_command(args):
-    """Handles the 'load' subcommand."""
     try:
         audio_data, sample_rate = formats.load_audio_track_from_container_optimized(args.path)
         print(f"Loaded audio track from '{args.path}'.")
         print(f"  Sample Rate: {sample_rate} Hz")
         print(f"  Number of Samples: {len(audio_data)}")
         print(f"  Data Type: {audio_data.dtype}")
-         # In a real application, you'd likely do something more useful
-        # with the audio data here, like saving it to a file, playing it, etc.
-    except (FileNotFoundError, av.error.AVError, RuntimeError, ValueError) as e:
-        print(f"Error: {e}", file=sys.stderr)
+    except Exception:
+        print(f"An error occurred while loading the audio track from '{args.path}':", file=sys.stderr)
+        traceback.print_exc()
         sys.exit(1)
 
 
@@ -36,7 +34,6 @@ def main():
         help="Available subcommands",
     )
 
-    # 'inspect' subcommand
     inspect_parser = subparsers.add_parser(
         "inspect",
         help="Inspect audio track details of a video file.",
