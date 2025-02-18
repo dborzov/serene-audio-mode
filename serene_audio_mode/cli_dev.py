@@ -12,7 +12,7 @@ def load_command(args):
         audio_data, sample_rate = formats.load_audio_track_from_container(args.path)
         print(f"Loaded audio track from '{args.path}'.")
         print(f"  Sample Rate: {sample_rate} Hz")
-        print(f"  Number of Samples: {len(audio_data)}")
+        print(f"  Number of Samples: {audio_data.size}")
         print(f"  Data Type: {audio_data.dtype}")
         formats.save_audio_as_mp3(audio_data, sample_rate, "output.mp3")
     except Exception:

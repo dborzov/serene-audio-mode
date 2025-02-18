@@ -29,7 +29,8 @@ def inspect_audio_tracks(video_file_path: str):
         print(f"Total File Size: {file_size / (1024 * 1024):,.2f} MB")
 
         with av.open(video_file_path) as container:
-            print(f"Container format: {container.format.long_name}")
+            extensions = ",".join(container.format.extensions)
+            print(f"Container format: {container.format.long_name} (file extensions: {extensions})")
 
             audio_streams = [stream for stream in container.streams if stream.type == 'audio']
             num_audio_tracks = len(audio_streams)
@@ -43,8 +44,8 @@ def inspect_audio_tracks(video_file_path: str):
                 print(f"\n--- Audio Track {i + 1} (streamID: { stream.index })---")
                 format_name = stream.codec_context.format.name if stream.codec_context.format else 'N/A'
                 if format_name != 'N/A':
-                    bits_per_sample = stream.codec_context.format.bytes
-                    calculated_bit_rate = stream.sample_rate * bits_per_sample * 8 * stream.channels
+                    bytes_per_sample = stream.codec_context.format.bytes
+                    calculated_bit_rate = stream.sample_rate * bytes_per_sample * stream.channels
                 if video_duration != 'N/A' and format_name != 'N/A':
                     estimated_bytes = int(video_duration * (calculated_bit_rate / 8))
                     print(f"  Bytesize: {estimated_bytes / (1024 * 1024):,.2f} MB")
@@ -53,6 +54,9 @@ def inspect_audio_tracks(video_file_path: str):
 
                 print(f"  Codec: {stream.codec_context.name}")
                 print(f"  Format: {format_name}")
+                if format_name != 'N/A':
+                    print(f"  Bytes per sample: {stream.codec_context.format.bytes}")
+                stream.codec_context.format.bytes
                 print(f"  Sample Rate: {stream.sample_rate} Hz")
 
                 if format_name != 'N/A':
@@ -100,13 +104,14 @@ def inspect_audio_tracks(video_file_path: str):
         print(f"An unexpected error occurred: {e}")
 
 
-def load_audio_track_from_container(video_file_path: str) -> tuple[np.ndarray, int]:
+def load_audio_track_from_container(video_file_path: str, verbose: bool = True) -> tuple[np.ndarray, int]:
     """
     Loads the first audio track from a video file, converts it to mono,
     and returns a NumPy array of audio samples along with the sample rate.
 
     Args:
         video_file_path: Path to the video file.
+        verbose: Whether to print progress messages. Default is True.
 
     Returns:
         A tuple containing:
@@ -116,22 +121,31 @@ def load_audio_track_from_container(video_file_path: str) -> tuple[np.ndarray, i
     Raises:
         Exception:  If any error happens.
     """
+
     with av.open(video_file_path) as container:
         audio_stream = next((s for s in container.streams if s.type == 'audio'), None)
         if audio_stream is None:
             raise RuntimeError(f"No audio stream found in '{video_file_path}'.")
+        sample_rate = audio_stream.sample_rate
+        duration_seconds = container.duration / av.time_base
+        if verbose:
+            print(f"Video Duration: {duration_seconds}s and sample rate {sample_rate} Hz")
 
-        resampler = av.AudioResampler(format='fltp', layout='mono', rate=audio_stream.rate)
-        sample_rate = audio_stream.rate
-
-        frames = []
-        for frame in container.decode(audio=0):
-            resampled_frames = resampler.resample(frame)
-            if resampled_frames:
-              frames.extend(resampled_frames)
-
-        if not frames:
-            raise RuntimeError(f"No audio frames decoded from '{video_file_path}'.")
-
-        audio_data = np.concatenate([f.planes[0] for f in frames])
-        return audio_data, sample_rate
+        buffer = None
+        buffer_size = 0
+        for idx, frame in enumerate(container.decode(audio_stream)):
+            f = frame.to_ndarray()
+            if len(f) == 0:
+                continue
+            if f.ndim > 1:  # if more than one channel, convert to mono for now
+                f = np.mean(f, axis=tuple(range(f.ndim - 1)))
+            if buffer is None:
+                allocate_size = int((duration_seconds + 1)*sample_rate)
+                print(f"Allocating buffer of size {allocate_size}...")
+                buffer = np.zeros( (allocate_size,), dtype=f.dtype)
+            buffer[buffer_size: buffer_size + len(f)] = f[:]
+            buffer_size += len(f)
+            if verbose and idx % 100 == 0:
+                seconds_processed = buffer_size / sample_rate  # Calculate processed time
+                print(f"Processed {idx} frames ({seconds_processed:.2f} seconds)...\r", end="") 
+        return buffer[:buffer_size], sample_rate
