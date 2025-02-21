@@ -2,6 +2,7 @@ import av
 import numpy as np
 import os
 import soundfile as sf
+import re
 
 
 def save_audio_as_mp3(y, sr, output_filename):
@@ -104,7 +105,8 @@ def inspect_audio_tracks(video_file_path: str):
         print(f"An unexpected error occurred: {e}")
 
 
-def load_audio_track_from_container(video_file_path: str, verbose: bool = True) -> tuple[np.ndarray, int]:
+
+def extract_audio_track_from_container(video_file_path: str, verbose: bool = True) -> tuple[np.ndarray, int]:
     """
     Loads the first audio track from a video file, converts it to mono,
     and returns a NumPy array of audio samples along with the sample rate.
@@ -149,3 +151,71 @@ def load_audio_track_from_container(video_file_path: str, verbose: bool = True) 
                 seconds_processed = buffer_size / sample_rate  # Calculate processed time
                 print(f"Processed {idx} frames ({seconds_processed:.2f} seconds)...\r", end="") 
         return buffer[:buffer_size], sample_rate
+
+
+
+def shift_subtitle_time(srt_file_path, shift_seconds):
+    """Shifts the timestamps in an SRT file by a specified number of seconds.
+
+    Args:
+        srt_file_path: Path to the SRT file.
+        shift_seconds:  The number of seconds to shift the timestamps by.
+                         Can be positive (shift forward) or negative (shift backward).
+
+    Returns:
+       A string containing the modified SRT file content, or None if an error occurred.
+    """
+
+    try:
+        with open(srt_file_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+    except FileNotFoundError:
+        print(f"Error: File not found: {srt_file_path}")
+        return None
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return None
+
+    modified_lines = []
+    for line in lines:
+        match = re.match(r'(\d{2}):(\d{2}):(\d{2}),(\d{3}) --> (\d{2}):(\d{2}):(\d{2}),(\d{3})', line)
+        if match:
+            try:
+                h1, m1, s1, ms1, h2, m2, s2, ms2 = map(int, match.groups())
+
+                # Convert to seconds and shift
+                total_seconds1 = h1 * 3600 + m1 * 60 + s1 + ms1 / 1000.0
+                total_seconds2 = h2 * 3600 + m2 * 60 + s2 + ms2 / 1000.0
+
+                shifted_seconds1 = total_seconds1 + shift_seconds
+                shifted_seconds2 = total_seconds2 + shift_seconds
+
+                # Handle negative times (clamp to 00:00:00,000)
+                if shifted_seconds1 < 0:
+                    shifted_seconds1 = 0
+                if shifted_seconds2 < 0:
+                    shifted_seconds2 = 0
+                    
+                # Convert back to HH:MM:SS,mmm format
+                new_h1, remaining_seconds1 = divmod(shifted_seconds1, 3600)
+                new_m1, remaining_seconds1 = divmod(remaining_seconds1, 60)
+                new_s1, new_ms1 = divmod(remaining_seconds1, 1)
+                new_ms1 = int(round(new_ms1 * 1000))  # Round milliseconds
+
+                new_h2, remaining_seconds2 = divmod(shifted_seconds2, 3600)
+                new_m2, remaining_seconds2 = divmod(remaining_seconds2, 60)
+                new_s2, new_ms2 = divmod(remaining_seconds2, 1)
+                new_ms2 = int(round(new_ms2 * 1000))
+              
+                # Ensure correct formatting (leading zeros)
+                new_time_str = f"{int(new_h1):02d}:{int(new_m1):02d}:{int(new_s1):02d},{new_ms1:03d} --> {int(new_h2):02d}:{int(new_m2):02d}:{int(new_s2):02d},{new_ms2:03d}"
+                modified_lines.append(new_time_str + "\n")
+
+            except ValueError:
+                print(f"Error parsing timestamp: {line.strip()}")
+                return None  # Invalid timestamp format
+        else:
+            modified_lines.append(line)  # Keep non-timestamp lines as they are
+
+    return "".join(modified_lines)
+
